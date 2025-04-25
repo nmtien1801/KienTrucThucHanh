@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: ../Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - GATEWAY_PORT=3000
+      - CUSTOMER_SERVICE_URL=http://customer:3001
+      - ORDER_SERVICE_URL=http://order:3002
+      - PRODUCT_SERVICE_URL=http://product:3003
+    depends_on:
+      - customer
+      - order
+      - product
+    networks:
+      - app-network
+
+  customer:
+    build:
+      context: ./customer
+      dockerfile: ../Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongo:27017/customer_db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  order:
+    build:
+      context: ./order
+      dockerfile: ../Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongo:27017/order_db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  product:
+    build:
+      context: ./product
+      dockerfile: ../Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongo:27017/product_db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+
+# docker-compose up --build

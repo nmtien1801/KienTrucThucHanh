@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use('/api/products', productRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
   console.log(`Service running on port ${PORT}`);
 });
